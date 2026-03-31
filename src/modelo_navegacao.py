@@ -3,7 +3,7 @@ import asyncio
 import flet
 from flet import ThemeMode, View, AppBar, Colors, Button
 
-
+# MODELO NAVEGAÇÂO BASE, TODOS USAM
 def main(page: flet.Page):
     #Configurar
     page.title = "exemplo de navegação"

@@ -2,12 +2,17 @@ import asyncio
 
 import flet
 from flet import ThemeMode, View, Colors, Button, TextField, ElevatedButton, Text, FloatingActionButton, Icons, \
-    ListView, Card, Column, Row, Icon, ListTile, PopupMenuPosition, PopupMenuButton, PopupMenuItem
+    ListView, Card, Column, Row, Icon, ListTile, PopupMenuPosition, PopupMenuButton, PopupMenuItem, DropdownOption, \
+    Dropdown, use_state
 
 
 # EXERCICIO 1 MENSAGEM COM O NOME
 
-
+class Perfil:
+    def __init__(self, nome, profissao, genero):
+        self.nome = nome
+        self.profissao = profissao
+        self.genero = genero
 
 def main(page: flet.Page):
     # CONFIGURAÇÕES
@@ -31,41 +36,13 @@ def main(page: flet.Page):
 
     def montar_lista_texto():
         list_view.controls.clear()
-
-
-
         for item in lista_dados:
             list_view.controls.append(
                 Text(item)
             )
 
-    def montar_lista_padrao():
-        list_view.controls.clear()
-
-
-
-        for item in lista_dados:
-            list_view.controls.append(
-                ListTile(
-                    leading=Icon(icon=Icons.PERSON, color=Colors.PURPLE_400),
-                    title=item,
-                    subtitle=f"{input_profissao.value}",
-                    trailing=PopupMenuButton(
-                        icon=Icon(icon=Icons.ADD, color=Colors.PURPLE_400),
-                        items=[
-                            PopupMenuItem("Ver Detalhes", icon=Icon(icon=Icons.REMOVE_RED_EYE, color=Colors.PURPLE_400)),
-                            PopupMenuItem("Editar", icon=Icon(icon=Icons.EDIT_OUTLINED, color=Colors.PURPLE_400)),
-                            PopupMenuItem("Excluir", icon=Icon(icon=Icons.DELETE, color=Colors.PURPLE_400,), on_click=lambda: excluir(item)),
-                        ]
-                    )
-                )
-            )
-
     def montar_lista_card():
         list_view.controls.clear()
-
-
-
         for item in lista_dados:
             list_view.controls.append(
                 Card(
@@ -81,6 +58,33 @@ def main(page: flet.Page):
 
                 )
             )
+
+    def icone_genero(p1):
+        if p1 == "Masculino":
+            return Icon(Icons.MAN, color=Colors.PURPLE_400)
+        elif p1 == "Feminino":
+            return Icon(Icons.GIRL, color=Colors.PURPLE_400)
+
+    def montar_lista_padrao():
+        list_view.controls.clear()
+        for item in lista_dados:
+            list_view.controls.append(
+                ListTile(
+                    leading=icone_genero(item.genero),
+                    title=item.nome,
+                    subtitle=item.profissao,
+                    trailing=PopupMenuButton(
+                        icon=Icon(icon=Icons.ADD, color=Colors.PURPLE_400),
+                        items=[
+                            PopupMenuItem("Ver Detalhes", icon=Icon(icon=Icons.REMOVE_RED_EYE, color=Colors.PURPLE_400)),
+                            PopupMenuItem("Editar", icon=Icon(icon=Icons.EDIT_OUTLINED, color=Colors.PURPLE_400)),
+                            PopupMenuItem("Excluir", icon=Icon(icon=Icons.DELETE, color=Colors.PURPLE_400,), on_click=lambda: excluir(item)),
+                        ]
+                    )
+                )
+            )
+
+
     def excluir(item):
         lista_dados.remove(item)
         montar_lista_padrao()
@@ -88,16 +92,34 @@ def main(page: flet.Page):
 
 
     def salvar_dados():
-        nome = input_nome.value.strip()
-
-
         nome = input_nome.value
+        profissao = input_profissao.value
+        genero = input_genero.value
+
+        tem_erro = False
+
 
         if nome:
-            lista_dados.append(nome)
             input_nome.error = None
         else:
             input_nome.error = "Campo Obrigatorio"
+            tem_erro = True
+
+        if profissao:
+            input_profissao.error = None
+        else:
+            input_profissao.error = "Campo Obrigatorio"
+            tem_erro = True
+
+        if genero:
+            input_genero.error = None
+        else:
+            input_genero.error = "Campo Obrigatorio"
+            tem_erro = True
+
+        if not tem_erro:
+            pes1 = Perfil(nome=nome.strip(),profissao= profissao.strip(), genero=genero.strip())
+            lista_dados.append(pes1)
 
 
         montar_lista_texto()
@@ -219,7 +241,15 @@ def main(page: flet.Page):
 
     input_profissao = TextField(label="Digite sua profissão", on_submit=salvar_dados)
 
-    input_genero = TextField(label="Digite seu genero", on_submit=salvar_dados)
+    input_genero =  Dropdown(
+        label="Genêro",
+        editable=True,
+        options=[
+
+            DropdownOption("Masculino"),
+            DropdownOption("Feminino"),
+        ],
+    )
 
     btn_salvar = Button("Salvar", width=400, on_click=lambda: salvar_dados())
 
